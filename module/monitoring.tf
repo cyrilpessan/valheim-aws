@@ -64,23 +64,23 @@ resource "aws_cloudwatch_event_target" "valheim_started" {
 
 ## TODO (check why this CNAME matters...)
 
-# data "aws_route53_zone" "selected" {
-#   count = var.domain != "" ? 1 : 0
+data "aws_route53_zone" "selected" {
+  count = var.domain != "" ? 1 : 0
 
-#   name = "${var.domain}."
-# }
+  name = "${var.domain}."
+}
 
-# resource "aws_route53_record" "valheim" {
-#   #checkov:skip=CKV2_AWS_23:Broken - https://github.com/bridgecrewio/checkov/issues/1359
-#   count = var.domain != "" ? 1 : 0
+resource "aws_route53_record" "valheim" {
+  #checkov:skip=CKV2_AWS_23:Broken - https://github.com/bridgecrewio/checkov/issues/1359
+  count = var.domain != "" ? 1 : 0
 
-#   zone_id = data.aws_route53_zone.selected[0].zone_id
-#   name    = local.name
-#   type    = "CNAME"
-#   ttl     = "300"
-#   records = [aws_spot_instance_request.valheim.public_dns]
-# }
+  zone_id = data.aws_route53_zone.selected[0].zone_id
+  name    = local.name
+  type    = "CNAME"
+  ttl     = "300"
+  records = [aws_spot_instance_request.valheim.public_dns]
+}
 
-# output "monitoring_url" {
-#   value = format("%s%s%s", "http://", var.domain != "" ? aws_route53_record.valheim[0].fqdn : aws_spot_instance_request.valheim.public_dns, ":19999")
-# }
+output "monitoring_url" {
+  value = format("%s%s%s", "http://", var.domain != "" ? aws_route53_record.valheim[0].fqdn : aws_spot_instance_request.valheim.public_dns, ":19999")
+}

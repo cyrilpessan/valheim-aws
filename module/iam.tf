@@ -47,22 +47,22 @@ resource "aws_iam_policy" "valheim" {
   })
 }
 
-# resource "aws_iam_policy" "valheim_cname" {
-#   count = var.domain != "" ? 1 : 0
+resource "aws_iam_policy" "valheim_cname" {
+  count = var.domain != "" ? 1 : 0
 
-#   name        = "${local.name}-cname"
-#   description = "Allows the Valheim server to update its own CNAME when recreated"
-#   policy = jsonencode({
-#     Version : "2012-10-17",
-#     Statement : [
-#       {
-#         Action : ["route53:ChangeResourceRecordSets"],
-#         Effect : "Allow",
-#         Resource : ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.selected[0].zone_id}"]
-#       }
-#     ]
-#   })
-# }
+  name        = "${local.name}-cname"
+  description = "Allows the Valheim server to update its own CNAME when recreated"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Action : ["route53:ChangeResourceRecordSets"],
+        Effect : "Allow",
+        Resource : ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.selected[0].zone_id}"]
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role_policy_attachment" "valheim" {
   role       = aws_iam_role.valheim.name
