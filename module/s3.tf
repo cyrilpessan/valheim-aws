@@ -29,16 +29,17 @@ resource "aws_s3_bucket_versioning" "valheim" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "valheim" {
-  bucket = aws_s3_bucket.valheim.bucket
+## encryption
+# resource "aws_s3_bucket_server_side_encryption_configuration" "valheim" {
+#   bucket = aws_s3_bucket.valheim.bucket
 
-  rule {
-    apply_server_side_encryption_by_default {
-      # kms_master_key_id = aws_kms_key.mykey.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       # kms_master_key_id = aws_kms_key.mykey.arn
+#       sse_algorithm     = "aws:kms"
+#     }
+#   }
+# }
 
 
 resource "aws_s3_bucket_policy" "valheim" {
@@ -79,7 +80,8 @@ resource "aws_s3_object" "install_valheim" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket         = aws_s3_bucket.valheim.id
   key            = "/install_valheim.sh"
-  content_base64 = base64encode(templatefile("${path.module}/local/install_valheim.sh", { username = local.username }))
+  # content_base64 = base64encode(templatefile("${path.module}/local/install_valheim.sh", { username = local.username }))
+  content        = templatefile("${path.module}/local/install_valheim.sh", { username = local.username })
   etag           = filemd5("${path.module}/local/install_valheim.sh")
 }
 
@@ -87,10 +89,14 @@ resource "aws_s3_object" "bootstrap_valheim" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket = aws_s3_bucket.valheim.id
   key    = "/bootstrap_valheim.sh"
-  content_base64 = base64encode(templatefile("${path.module}/local/bootstrap_valheim.sh", {
+  # content_base64 = base64encode(templatefile("${path.module}/local/bootstrap_valheim.sh", {
+  #   username = local.username
+  #   bucket   = aws_s3_bucket.valheim.id
+  # }))
+  content = templatefile("${path.module}/local/bootstrap_valheim.sh", {
     username = local.username
     bucket   = aws_s3_bucket.valheim.id
-  }))
+  })
   etag = filemd5("${path.module}/local/bootstrap_valheim.sh")
 }
 
@@ -98,14 +104,22 @@ resource "aws_s3_object" "start_valheim" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket = aws_s3_bucket.valheim.id
   key    = "/start_valheim.sh"
-  content_base64 = base64encode(templatefile("${path.module}/local/start_valheim.sh", {
+  # content_base64 = base64encode(templatefile("${path.module}/local/start_valheim.sh", {
+  #   username        = local.username
+  #   bucket          = aws_s3_bucket.valheim.id
+  #   use_domain      = var.domain != "" ? true : false
+  #   world_name      = var.world_name
+  #   server_name     = var.server_name
+  #   server_password = var.server_password
+  # }))
+  content = templatefile("${path.module}/local/start_valheim.sh", {
     username        = local.username
     bucket          = aws_s3_bucket.valheim.id
     use_domain      = var.domain != "" ? true : false
     world_name      = var.world_name
     server_name     = var.server_name
     server_password = var.server_password
-  }))
+  })
   etag = filemd5("${path.module}/local/start_valheim.sh")
 }
 
@@ -113,11 +127,16 @@ resource "aws_s3_object" "backup_valheim" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket = aws_s3_bucket.valheim.id
   key    = "/backup_valheim.sh"
-  content_base64 = base64encode(templatefile("${path.module}/local/backup_valheim.sh", {
+  # content_base64 = base64encode(templatefile("${path.module}/local/backup_valheim.sh", {
+  #   username   = local.username
+  #   bucket     = aws_s3_bucket.valheim.id
+  #   world_name = var.world_name
+  # }))
+  content = templatefile("${path.module}/local/backup_valheim.sh", {
     username   = local.username
     bucket     = aws_s3_bucket.valheim.id
     world_name = var.world_name
-  }))
+  })
   etag = filemd5("${path.module}/local/backup_valheim.sh")
 }
 
@@ -125,7 +144,8 @@ resource "aws_s3_object" "crontab" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket         = aws_s3_bucket.valheim.id
   key            = "/crontab"
-  content_base64 = base64encode(templatefile("${path.module}/local/crontab", { username = local.username }))
+  # content_base64 = base64encode(templatefile("${path.module}/local/crontab", { username = local.username }))
+  content = templatefile("${path.module}/local/crontab", { username = local.username })
   etag           = filemd5("${path.module}/local/crontab")
 }
 
@@ -133,7 +153,8 @@ resource "aws_s3_object" "valheim_service" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket         = aws_s3_bucket.valheim.id
   key            = "/valheim.service"
-  content_base64 = base64encode(templatefile("${path.module}/local/valheim.service", { username = local.username }))
+  # content_base64 = base64encode(templatefile("${path.module}/local/valheim.service", { username = local.username }))
+  content = templatefile("${path.module}/local/valheim.service", { username = local.username })
   etag           = filemd5("${path.module}/local/valheim.service")
 }
 
@@ -141,7 +162,8 @@ resource "aws_s3_object" "admin_list" {
   #checkov:skip=CKV_AWS_186:KMS encryption is not necessary
   bucket         = aws_s3_bucket.valheim.id
   key            = "/adminlist.txt"
-  content_base64 = base64encode(templatefile("${path.module}/local/adminlist.txt", { admins = values(var.admins) }))
+  # content_base64 = base64encode(templatefile("${path.module}/local/adminlist.txt", { admins = values(var.admins) }))
+  content = templatefile("${path.module}/local/adminlist.txt", { admins = values(var.admins) })
   etag           = filemd5("${path.module}/local/adminlist.txt")
 }
 

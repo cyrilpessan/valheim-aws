@@ -26,6 +26,16 @@ resource "aws_security_group_rule" "netdata" {
   description       = "Allows traffic to the Netdata dashboard"
 }
 
+resource "aws_security_group_rule" "ssh_in" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-ingress-sgr
+  security_group_id = aws_security_group.ingress.id
+  description       = "Allows SSH"
+}
+
 resource "aws_security_group_rule" "egress" {
   type              = "egress"
   from_port         = 0
@@ -65,6 +75,8 @@ resource "aws_spot_instance_request" "valheim" {
     http_tokens   = "required"
   }
   tags = local.ec2_tags
+
+  key_name = var.ec2_keypair_name
 
   depends_on = [
     aws_s3_object.install_valheim,

@@ -12,6 +12,23 @@ module "main" {
   sns_email        = var.sns_email
   unique_id        = var.unique_id
   world_name       = var.world_name
+  ec2_keypair_name = var.ec2_keypair_name
+}
+
+resource "aws_s3_object" "world_fwl" {
+  count = var.initial_world_name != "" ? 1 : 0
+  bucket         = module.main.bucket_id
+  key            = "${var.initial_world_name}.fwl"
+  source         = "./world/${var.initial_world_name}.fwl"
+  etag           = filemd5("./world/${var.initial_world_name}.fwl")
+}
+
+resource "aws_s3_object" "world_db" {
+  count = var.initial_world_name != "" ? 1 : 0
+  bucket         = module.main.bucket_id
+  key            = "${var.initial_world_name}.db"
+  source         = "./world/${var.initial_world_name}.db"
+  etag           = filemd5("./world/${var.initial_world_name}.db")
 }
 
 # output "monitoring_url" {

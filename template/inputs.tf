@@ -58,3 +58,15 @@ variable "unique_id" {
   default     = ""
   description = "The ID of the deployment (used for tests)"
 }
+
+variable "ec2_keypair_name" {
+  type        = string
+  default     = ""
+  description = "The key pair name associated to the EC2 isntance"
+}
+
+variable "initial_world_name" {
+  type        = string
+  default     = ""
+  description = "The name of the initial world to be used by the server"
+}

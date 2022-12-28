@@ -9,6 +9,7 @@ variable "server_name" { type = string }
 variable "server_password" { type = string }
 variable "purpose" { type = string }
 variable "unique_id" { type = string }
+variable "ec2_keypair_name" { type = string }
 
 locals {
   username = "vhserver"
