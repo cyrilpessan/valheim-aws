@@ -1,5 +1,5 @@
-module "main" {
-  source = "../module"
+module "vhserver" {
+  source = "../modules/vhserver"
 
   admins           = var.admins
   aws_region       = var.aws_region
@@ -16,37 +16,37 @@ module "main" {
 }
 
 resource "aws_s3_object" "world_fwl" {
-  count = var.initial_world_name != "" ? 1 : 0
-  bucket         = module.main.bucket_id
+  count          = var.initial_world_name != "" ? 1 : 0
+  bucket         = module.vhserver.bucket_id
   key            = "${var.initial_world_name}.fwl"
   source         = "./world/${var.initial_world_name}.fwl"
   etag           = filemd5("./world/${var.initial_world_name}.fwl")
 }
 
 resource "aws_s3_object" "world_db" {
-  count = var.initial_world_name != "" ? 1 : 0
-  bucket         = module.main.bucket_id
+  count          = var.initial_world_name != "" ? 1 : 0
+  bucket         = module.vhserver.bucket_id
   key            = "${var.initial_world_name}.db"
   source         = "./world/${var.initial_world_name}.db"
   etag           = filemd5("./world/${var.initial_world_name}.db")
 }
 
-# output "monitoring_url" {
-#   value       = module.main.monitoring_url
-#   description = "URL to monitor the Valheim Server"
-# }
+output "monitoring_url" {
+  value       = module.vhserver.monitoring_url
+  description = "URL to monitor the Valheim Server"
+}
 
 output "bucket_id" {
-  value       = module.main.bucket_id
+  value       = module.vhserver.bucket_id
   description = "The S3 bucket name"
 }
 
 output "instance_id" {
-  value       = module.main.instance_id
+  value       = module.vhserver.instance_id
   description = "The EC2 instance ID"
 }
 
 # output "valheim_user_passwords" {
-#   value       = module.main.valheim_user_passwords
+#   value       = module.vhserver.valheim_user_passwords
 #   description = "List of AWS users and their encrypted passwords"
 # }
