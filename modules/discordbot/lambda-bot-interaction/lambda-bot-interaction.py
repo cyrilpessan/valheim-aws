@@ -3,7 +3,8 @@ import boto3
 import os
 from nacl.signing import VerifyKey
 
-lambda_client = boto3.client('lambda')
+sns_client = boto3.client('sns')
+
 
 ''' public key found on Discord Application -> General Information page '''
 DISCORD_PUBLIC_KEY = os.getenv('DISCORD_PUBLIC_KEY')
@@ -41,17 +42,17 @@ def lambda_handler(event, context):
     # print(discordSecrets)
     # print(f"Received event: {json.dumps(event, indent=4)}")
 
-    headers = {
-        'Content-Type': 'application/json'
-    }
+    # headers = {
+    #     'Content-Type': 'application/json'
+    # }
     
-    headers_full = {
-        'Access-Control-Allow-Credentials': "true",
-        'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST',
-        'Content-Type': 'application/json',
-        "Vary": 'Origin',
-    }
+    # headers_full = {
+    #     'Access-Control-Allow-Credentials': "true",
+    #     'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+    #     'Access-Control-Allow-Methods': 'OPTIONS,POST',
+    #     'Content-Type': 'application/json',
+    #     "Vary": 'Origin',
+    # }
 
     # verify the signature
     try:
@@ -65,6 +66,23 @@ def lambda_handler(event, context):
     # check if message is a ping
     if body.get("type") == 1:
         return PING_PONG
+    
+    cmd_name = body.get("data").get("name")
+    # cmd_options = body.get("data").get("options")
+    
+    response = sns_client.publish(
+        TargetArn=os.environ['SNS_PUBLISH_VH_ARN'],
+        Message=json.dumps({
+            "default": json.dumps(body)
+            }),
+        MessageStructure='json',
+        MessageAttributes= {
+            "command": { 
+                'DataType': 'String', 
+                'StringValue': cmd_name 
+                } 
+            }
+    )
 
     # dummy return
     ret = {

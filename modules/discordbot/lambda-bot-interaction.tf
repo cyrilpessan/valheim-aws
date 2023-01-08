@@ -1,27 +1,23 @@
 ###############################################################################
 # lambda bot - iam
 
-resource "aws_iam_role" "lambda_bot_interaction_role" {
-  name = "serverless_lambda"
+#########
+# SNS
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
+data "aws_iam_policy_document" "Lambda-SNS-Publish" {
+  statement {
+    effect = "Allow"
+    actions   = ["sns:Publish", "sns:GetTopicAttributes", "sns:ListTopics"]
+    # resources = ["*"]
+    resources = [ aws_sns_topic.discordbot_sns_vh_topic.arn ]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
-  role       = aws_iam_role.lambda_bot_interaction_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+resource "aws_iam_policy" "Lambda-SNS-Publish" {
+  name        = "Lambda-SNS-Publish"
+  path        = var.discordbot_iam_path
+  description = "Lambda-SNS-Publish"
+  policy      = data.aws_iam_policy_document.Lambda-SNS-Publish.json
 }
 
 ###############################################################################
@@ -45,9 +41,12 @@ module "lambda_bot_interaction" {
   runtime       = "python3.9"
   publish       = true
 
-  attach_policy = true
-  policy = aws_iam_role_policy_attachment.lambda_policy.policy_arn
-  # policy = aws_iam_role_policy.lambda_policy.id
+  attach_policies = true
+  policies = [
+    aws_iam_policy.Lambda-SNS-Publish.arn,
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+  number_of_policies = 2
 
   source_path = "${path.module}/lambda-bot-interaction"
 
@@ -60,8 +59,7 @@ module "lambda_bot_interaction" {
 
   environment_variables = {
     DISCORD_PUBLIC_KEY = var.discord_public_key
-    # DISCORD_AUTH_TOKEN = var.discord_auth_token
-    # COMMAND_LAMBDA_ARN = aws_lambda_function.lambda_bot_command.arn
+    SNS_PUBLISH_VH_ARN = aws_sns_topic.discordbot_sns_vh_topic.arn
   }
 
   allowed_triggers = {
@@ -71,23 +69,10 @@ module "lambda_bot_interaction" {
     },
   }
 
-  ######################
-  # Lambda Function URL
-  ######################
-  create_lambda_function_url = true
-  authorization_type         = "AWS_IAM"
-  cors = {
-    allow_credentials = true
-    allow_origins     = ["*"]
-    allow_methods     = ["*"]
-    allow_headers     = ["date", "keep-alive"]
-    expose_headers    = ["keep-alive", "date"]
-    max_age           = 86400
-  }
-
+  # Timeout in seconds. 
+  # Discord allows only 3 seconds to receive the initial answer (can be a ACK)
   timeout = 3
 
-  lambda_role = aws_iam_role.lambda_bot_interaction_role.arn
 
   # tags = {
   #   Module = "lambda-with-layer"

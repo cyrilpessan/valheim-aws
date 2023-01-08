@@ -54,7 +54,7 @@ resource "aws_api_gateway_rest_api_policy" "discord_bot_api" {
       "Effect": "Allow",
       "Principal": "*",
       "Action": "execute-api:Invoke",
-      "Resource": "execute-api:/*/*/*"
+      "Resource": "${aws_api_gateway_rest_api.discord_bot_api.execution_arn}/*/*/*"
     }
   ]
 }

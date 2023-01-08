@@ -18,6 +18,10 @@ resource "null_resource" "discord_lambda_layer_generate" {
       DISCORD_LAYER_WORKING_DIR = var.discord_layer_working_dir
      }
   }
+
+  triggers = {
+    policy_sha1 = "${sha1(file("${path.module}/scripts/generate-layer.sh"))}"
+  }
 }
 
 ## Package and deploy the layer
