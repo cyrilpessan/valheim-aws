@@ -1,7 +1,26 @@
+# Deployment variables ------------------------------------------------------------
+
+variable "stage" {
+  type = string
+  default = "dev"
+  description = "Deployment stage name"
+}
+
+# AWS variables ------------------------------------------------------------
+
+variable "account_id" {
+  type = string
+  default = ""
+  description = "The AWS account id"
+  sensitive = true
+}
+
 variable "aws_region" {
   type        = string
   description = "The AWS region to create the Valheim server"
 }
+
+# Valheim server variables ----------------------------------------------------
 
 variable "admins" {
   type        = map(any)
@@ -69,4 +88,20 @@ variable "initial_world_name" {
   type        = string
   default     = ""
   description = "The name of the initial world to be used by the server"
+}
+
+# discord bot variables -------------------------------------------------------
+
+variable "discord_public_key" { 
+  type = string 
+  default     = ""
+  description = "The Discord public key"
+  sensitive   = true
+}
+
+variable "discord_auth_token" { 
+  type = string 
+  default     = ""
+  description = "The Discord auth token"
+  sensitive   = true
 }

@@ -132,3 +132,14 @@ override.tf.json
 *.test-data
 
 aws-secrets*.*
+
+### Python
+
+*.env*
+!.env.example
+env/
+
+### builds
+
+build*/
+

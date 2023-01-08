@@ -1,0 +1,27 @@
+{
+    "name": "vh",
+    "type": 1,
+    "description": "Valheim server commands",
+    "options": [
+        {
+            "name": "valheim_server_controls",
+            "description": "What do you want to do?",
+            "type": 3,
+            "required": true,
+            "choices": [
+                {
+                    "name": "status",
+                    "value": "status"
+                },
+                {
+                    "name": "start",
+                    "value": "start"
+                },
+                {
+                    "name": "stop",
+                    "value": "stop"
+                }
+            ]
+        }
+    ]
+}

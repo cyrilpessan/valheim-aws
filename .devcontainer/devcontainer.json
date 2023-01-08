@@ -6,7 +6,9 @@
 	"image": "mcr.microsoft.com/devcontainers/base:jammy",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {},
-		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.9"
+		},
 		"ghcr.io/devcontainers/features/terraform:1": {},
 		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
 		"ghcr.io/dhoeric/features/terraform-docs:1": {},

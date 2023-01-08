@@ -84,9 +84,9 @@ resource "aws_spot_instance_request" "valheim" {
     aws_s3_object.backup_valheim,
     aws_s3_object.crontab,
     aws_s3_object.valheim_service,
-    aws_s3_object.admin_list
-    # aws_s3_object.update_cname_json[0],
-    # aws_s3_object.update_cname[0]
+    aws_s3_object.admin_list,
+    aws_s3_object.update_cname_json[0],
+    aws_s3_object.update_cname[0]
   ]
 }
 
