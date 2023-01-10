@@ -40,9 +40,10 @@
 module "discordbot" {
   source = "../modules/discordbot"
 
-  account_id         = var.account_id
-  aws_region         = var.aws_region
-  discord_public_key = var.discord_public_key
-  discord_auth_token = var.discord_auth_token
-  stage              = var.stage
+  account_id              = var.account_id
+  aws_region              = var.aws_region
+  discord_public_key      = var.discord_public_key
+  discord_auth_token      = var.discord_auth_token
+  discord_application_id  = var.discord_application_id
+  stage                   = var.stage
 }

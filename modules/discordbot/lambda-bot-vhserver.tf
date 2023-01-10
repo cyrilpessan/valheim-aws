@@ -4,51 +4,51 @@
 #########
 # SNS
 
-data "aws_iam_policy_document" "Lambda-SNS-Publish" {
+data "aws_iam_policy_document" "Lambda_SNS_Subscribe" {
   statement {
     effect = "Allow"
-    actions   = ["sns:Publish", "sns:GetTopicAttributes", "sns:ListTopics"]
+    actions   = ["sns:Subscribe", "sns:GetTopicAttributes", "sns:ListTopics"]
     resources = [ aws_sns_topic.discordbot_sns_vh_topic.arn ]
   }
 }
 
-resource "aws_iam_policy" "Lambda-SNS-Publish" {
-  name        = "Lambda-SNS-Publish"
+resource "aws_iam_policy" "Lambda_SNS_Subscribe" {
+  name        = "Lambda_SNS_Subscribe"
   path        = var.discordbot_iam_path
-  description = "Lambda-SNS-Publish"
-  policy      = data.aws_iam_policy_document.Lambda-SNS-Publish.json
+  description = "Lambda_SNS_Subscribe"
+  policy      = data.aws_iam_policy_document.Lambda_SNS_Subscribe.json
 }
 
 ###############################################################################
-# lambda bot - interaction
+# lambda bot - command
 
-variable "lambda_bot_interaction_name" { 
+variable "lambda_bot_vh_name" { 
   type = string 
-  default = "lambda-bot-interaction"
+  default = "lambda-bot-vhserver"
 }
 
 locals {
-  lambda_bot_interaction_name = "${var.lambda_bot_interaction_name}-${var.stage}"
+  lambda_bot_vh_name = "${var.lambda_bot_vh_name}-${var.stage}"
 }
 
-module "lambda_bot_interaction" {
+module "lambda_bot_vh" {
   source = "terraform-aws-modules/lambda/aws"
   version = "4.7.1"
 
-  function_name = local.lambda_bot_interaction_name
-  description   = "lambda-bot-interaction"
-  handler       = "${var.lambda_bot_interaction_name}.lambda_handler"
+  function_name = local.lambda_bot_vh_name
+  description   = "lambda-bot-vhserver"
+  handler       = "${var.lambda_bot_vh_name}.lambda_handler"
   runtime       = "python3.9"
   publish       = true
 
   attach_policies = true
   policies = [
-    aws_iam_policy.Lambda-SNS-Publish.arn,
+    aws_iam_policy.Lambda_SNS_Subscribe.arn,
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   ]
   number_of_policies = 2
 
-  source_path = "${path.module}/lambda-bot-interaction"
+  source_path = "${path.module}/lambda-bot-vhserver"
 
   # store_on_s3 = true
   # s3_bucket   = "my-bucket-id-with-lambda-builds"
@@ -59,22 +59,26 @@ module "lambda_bot_interaction" {
 
   environment_variables = {
     DISCORD_PUBLIC_KEY = var.discord_public_key
-    SNS_PUBLISH_VH_ARN = aws_sns_topic.discordbot_sns_vh_topic.arn
+    DISCORD_AUTH_TOKEN = var.discord_auth_token
+    DISCORD_APP_ID = var.discord_application_id
   }
 
   allowed_triggers = {
-    APIGatewayPost = {
-      service    = "apigateway"
-      source_arn = "${aws_api_gateway_deployment.discord_bot_api.execution_arn}*/POST/event"
-    },
+    SNSTopic = {
+        service = "sns"
+        source_arn = aws_sns_topic.discordbot_sns_vh_topic.arn
+    }
   }
+
+  
 
   # Timeout in seconds. 
   # Discord allows only 3 seconds to receive the initial answer (can be a ACK)
-  timeout = 3
+  timeout = 300
 
 
   # tags = {
   #   Module = "lambda-with-layer"
   # }
 }
+

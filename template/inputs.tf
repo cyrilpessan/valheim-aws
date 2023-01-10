@@ -95,13 +95,20 @@ variable "initial_world_name" {
 variable "discord_public_key" { 
   type = string 
   default     = ""
-  description = "The Discord public key"
+  description = "The Discord bot public key"
   sensitive   = true
 }
 
 variable "discord_auth_token" { 
   type = string 
   default     = ""
-  description = "The Discord auth token"
+  description = "The Discord bot auth token"
+  sensitive   = true
+}
+
+variable "discord_application_id" { 
+  type = string 
+  default     = ""
+  description = "The Discord bot application ID"
   sensitive   = true
 }

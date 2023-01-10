@@ -13,9 +13,12 @@ PING_PONG = {"type": 1}
 
 RESPONSE_TYPES = {
     "PONG": 1,
-    "ACK_NO_SOURCE": 2,
-    "MESSAGE_WITH_SOURCE": 4,
-    "ACK_WITH_SOURCE": 5
+    "CHANNEL_MESSAGE_WITH_SOURCE": 4,
+    "DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE": 5,
+    "DEFERRED_UPDATE_MESSAGE": 6,
+    "UPDATE_MESSAGE": 7,
+    "APPLICATION_COMMAND_AUTOCOMPLETE_RESULT": 8,
+    "MODAL": 9,
 }
 
 def verifyEvent(event) -> bool:
@@ -67,13 +70,15 @@ def lambda_handler(event, context):
     if body.get("type") == 1:
         return PING_PONG
     
+    # TODO check the other types
+    
     cmd_name = body.get("data").get("name")
     # cmd_options = body.get("data").get("options")
     
     response = sns_client.publish(
         TargetArn=os.environ['SNS_PUBLISH_VH_ARN'],
         Message=json.dumps({
-            "default": json.dumps(body)
+            "default": json.dumps(event)
             }),
         MessageStructure='json',
         MessageAttributes= {
@@ -84,43 +89,20 @@ def lambda_handler(event, context):
             }
     )
 
-    # dummy return
+    # ACK the initial command, the "command" lambda will takeover the real answer.
     ret = {
-        "type": RESPONSE_TYPES['MESSAGE_WITH_SOURCE'],
+        "type": RESPONSE_TYPES['DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE'],
         "data": {
             "tts": False,
-            "content": "BEEP BOOP",
+            "content": "Processing the request. Please wait...",
             "embeds": [],
             "allowed_mentions": []
         }
     }
     return ret
 
-    # if (event):
-    #     t = json_extract(event, 'type')[0]
-    #     if t == 1:
-    #         # Return pongs for pings
-    #         if (verified):
-    #             return {
-    #                 "type": 1
-    #             }
-
-    #     elif t == 2:
-    #         # Invoke the lambda to respond to the deferred message.
-    #         lambda_client.invoke(FunctionName=os.getenv('COMMAND_LAMBDA_ARN'),
-    #                              InvocationType='Event',
-    #                              Payload=json.dumps(event, separators=(',', ':')))
-
-    #         # Note that all responses are deferred to meet Discord's 3 second
-    #         # response time requirement.
-    #         if (verified):
-    #             return {
-    #                 type: 5,
-    #             }
-    #     else:
-    #         print("[UNAUTHORIZED] invalid request signature")
-
-
+###############################################################################
+## TEST
 if __name__ == '__main__':
     ret = lambda_handler(json.loads("""
 {
