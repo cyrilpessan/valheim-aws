@@ -144,3 +144,5 @@ build*/
 
 ### infra config
 infra/deploy/config/*
+!infra/deploy/config/world/.keep
+!infra/deploy/config/.keep
