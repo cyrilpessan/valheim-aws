@@ -140,6 +140,7 @@ aws-secrets*.*
 env/
 
 ### builds
-
 build*/
 
+### infra config
+infra/deploy/config/*

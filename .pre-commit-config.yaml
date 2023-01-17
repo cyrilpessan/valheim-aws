@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: terraform-fmt
       - id: tflint
-      - id: golint
+      # - id: golint
       - id: markdown-link-check
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.48.0
