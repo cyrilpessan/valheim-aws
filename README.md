@@ -52,7 +52,7 @@ stage = "dev"
 # AWS settings
 account_id       = "<AWS account id>"
 aws_region       = "eu-west-3"         // Choose a region closest to your physical location
-sns_email        = "cyril.pessan@gmail.com" // Alert go here e.g. server started, server stopped
+sns_email        = "your_mail@mail.com" // Alert go here e.g. server started, server stopped
 
 # Valheim server
 world_name          = "<name of your Valheim world>"
