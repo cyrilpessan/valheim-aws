@@ -158,8 +158,8 @@ def vh_status(endpointInfo, token):
     if (status == "running"):
         content = f"""
 Server status: {status}
-Public DNS name: {dns}
-Public IPv4 address: {ip}
+Valheim connection using the public DNS: {dns}:2456
+Valheim connection using the public IPv4 address: {ip}:2456
 """
     else:
         content = f"Server status: {status}"
